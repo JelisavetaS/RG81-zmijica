@@ -149,4 +149,6 @@ static void on_display(void)
 
     /* Nova slika se salje na ekran. */
     glutSwapBuffers();
+
 }
+
