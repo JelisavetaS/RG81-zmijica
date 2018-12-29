@@ -107,10 +107,9 @@ static void on_timer(int value){
         glutTimerFunc(20, on_timer, 1);
     }
 
-    srand(time(NULL));
-
     /*Pojavljivanje vockice - random generisanje*/
-    if(value == 2 && !prikazivanje){
+    if(value == 2 && !prikazivanje && game == 1){
+    	srand(time(NULL));
         pozicija_x = rand() % 25 - 12;
         pozicija_z = rand() % 25  - 12;
 
@@ -202,7 +201,9 @@ static void on_keyboard(unsigned char key, int x, int y)
     		move_X = 0;
             move_Z = 0;
             game = 1;
-
+            srand(time(NULL));
+       		pozicija_x = rand() % 25 - 12;
+        	pozicija_z = rand() % 25  - 12;
     	}
 
         
@@ -282,7 +283,7 @@ static void on_reshape(int width, int height)
 static void idle(void)
 {	
 	/*Ukoliko se dodje do odredjenog skora pokrece se animacija pobede*/
-	if(score > 800){
+	if(score == 800){
 		if(!animation_active){
 			animation_active = true;
 			glutTimerFunc(5, on_timer, 3);
@@ -452,84 +453,85 @@ static void on_display(void)
 	glEnable(GL_COLOR_MATERIAL);
 
 	/*Ukoliko se postigne odredjeni score igra se zaustavlja i scena se vrti u znak pobede*/
-	if(score > 800){
+	if(score == 800){
 		game = 0;
 		glRotatef(animation_parametar%180, 0, 1, 0);
 	}
 	/*Pod napravljen od kocke translirane tako da
 	njena gornja ivica bude u centru koordinatnog 
 	sistema*/
-	glColor3f(0,0.4,0);
-	//glRotatef(45, 0, 1, 0);
-	glPushMatrix();
-	glTranslatef(0, -1, 0);
-	glScalef(31, 0, 31);
-	glutSolidCube(1);
-
-	glPopMatrix();
-
-	/*Desni zid napravljen od kocke koja je translirana
-	do desne ivice poda a zatim skalirana po celoj duzini z-ose
-	poda i po y-osi kako bi dobio na visini*/
-	glColor3f(0,0.2,0);
-	glPushMatrix();
-	glTranslatef(15.5, 0, 0);
-	glScalef(0, 8, 31);
-	glutSolidCube(1);
-	glPopMatrix();
-
-	/*Levi zid napravljen od kocke koja je translirana
-	do leve ivice poda a zatim skalirana po celoj duzini z-ose
-	poda i po y-osi kako bi dobio na visini*/
-	glColor3f(0,0.2,0);
-	glPushMatrix();
-	glTranslatef(-15.5, 0, 0);
-	glScalef(0, 8, 31);
-	glutSolidCube(1);
-	glPopMatrix();
-
-	/*Gornji zid*/
-	glColor3f(0.251,0.251,0.251);
-	glPushMatrix();
-	glTranslatef(0, 0, 15.5);
-	glScalef(31, 8, 0);
-	glutSolidCube(1);
-	glPopMatrix();
-
-	/*Donji zid*/
-	glColor3f(0.251,0.251,0.251);
-	glPushMatrix();
-	glTranslatef(0, 0, -15.5);
-	glScalef(31, 8, 0);
-	glutSolidCube(1);
-	glPopMatrix();
-
-	/*Pravljenje zmijice, ide se celom njenom duzinom i delovi se prave u onosu na pomeraj koji je igrac napravio*/
-	for(int i = 0 ; i< duzina; i++)
 	{
-		// printf("%d %d\n",zmijica[i].x, zmijica[i].z );
-		glColor3f(0.5, 1, 0.5);
+		glColor3f(0,0.4,0);
 		glPushMatrix();
-		glTranslatef(zmijica[i].x ,0, zmijica[i].z);
+		glTranslatef(0, -1, 0);
+		glScalef(31, 0, 31);
 		glutSolidCube(1);
-		glPopMatrix();	
-	}
 
-	/*Pravljenje vockice random generisano*/
-	if(prikazivanje)
-	{
-		glColor3f(0.96, 0.04, 0.04);
-	 	glPushMatrix();
-	  	glTranslatef(pozicija_x ,1, pozicija_z);
-	    glutSolidSphere(0.5, 50, 50);
-	    glPopMatrix();
+		glPopMatrix();
+
+		/*Desni zid napravljen od kocke koja je translirana
+		do desne ivice poda a zatim skalirana po celoj duzini z-ose
+		poda i po y-osi kako bi dobio na visini*/
+		glColor3f(0,0.2,0);
+		glPushMatrix();
+		glTranslatef(15.5, 0, 0);
+		glScalef(0, 8, 31);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		/*Levi zid napravljen od kocke koja je translirana
+		do leve ivice poda a zatim skalirana po celoj duzini z-ose
+		poda i po y-osi kako bi dobio na visini*/
+		glColor3f(0,0.2,0);
+		glPushMatrix();
+		glTranslatef(-15.5, 0, 0);
+		glScalef(0, 8, 31);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		/*Gornji zid*/
+		glColor3f(0.251,0.251,0.251);
+		glPushMatrix();
+		glTranslatef(0, 0, 15.5);
+		glScalef(31, 8, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		/*Donji zid*/
+		glColor3f(0.251,0.251,0.251);
+		glPushMatrix();
+		glTranslatef(0, 0, -15.5);
+		glScalef(31, 8, 0);
+		glutSolidCube(1);
+		glPopMatrix();
+
+		/*Pravljenje zmijice, ide se celom njenom duzinom i delovi se prave u onosu na pomeraj koji je igrac napravio*/
+		for(int i = 0 ; i< duzina; i++)
+		{
+			// printf("%d %d\n",zmijica[i].x, zmijica[i].z );
+			glColor3f(0.5, 1, 0.5);
+			glPushMatrix();
+			glTranslatef(zmijica[i].x ,0, zmijica[i].z);
+			glutSolidCube(1);
+			glPopMatrix();	
+		}
+
+		/*Pravljenje vockice random generisano*/
+		if(prikazivanje)
+		{
+			glColor3f(0.96, 0.04, 0.04);
+		 	glPushMatrix();
+		  	glTranslatef(pozicija_x ,1, pozicija_z);
+		    glutSolidSphere(0.5, 50, 50);
+		    glPopMatrix();
+		}
 	}
 
 	/*Pozivamo funkciju koja nam omogucava prikaz score-a*/
 	counter();
 
 
-    /* Nova slika se salje na ekran. */
+    /* Nova slika se salje na ekran*/
     glutSwapBuffers();
 
 }
