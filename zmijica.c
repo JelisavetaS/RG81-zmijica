@@ -6,12 +6,23 @@
 #include <GL/glu.h>
 #include <stdbool.h>
 #include <string.h>
+#include "image.h"
+
+/* Imena fajlova sa teksturama. */
+#define FILENAME0 "grass.bmp"
+
+
+/* Identifikatori tekstura. */
+static GLuint names[1];
 
 /*pomocne promenljive za obradu kolizija*/
 static int game = 1;
 static int poruka = 1;
 static int score = 0;
 static int best = 0;
+
+/* Kumulativana matrica rotacije. */
+static float matrix[16];
 
 static int animation_parametar = 0;
 static bool animation_active = false;
@@ -68,8 +79,55 @@ int main(int argc, char **argv)
     glutSpecialFunc(Specialkey);
     glutIdleFunc(idle);
 
-    /* Obavljamo inicijalizaciju  OpenGL-a. */
+    /* Obavljamo inicijalizaciju OpenGL-a. */
     glClearColor(0.8, 0.8, 0.8, 0);
+    /* Objekat koji predstavlja teskturu ucitanu iz fajla */
+    Image * image;
+
+    /* Ukljucuju se teksture. */
+    glEnable(GL_TEXTURE_2D);
+
+    glTexEnvf(GL_TEXTURE_ENV,
+              GL_TEXTURE_ENV_MODE,
+              GL_REPLACE);
+
+    /*
+     * Inicijalizuje se objekat koji ce sadrzati teksturu ucitanu iz
+     * fajla
+     */
+    image = image_init(0, 0);
+
+    /* Kreira se tekstura*/
+    image_read(image, FILENAME0);
+
+    /* Generisu se identifikatori tekstura. */
+    glGenTextures(1, names);
+
+    glBindTexture(GL_TEXTURE_2D, names[0]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+
+
+    /*Iskljucujemo aktivnu teksturu*/
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    /* Unistava se objekat za citanje tekstura iz fajla. */
+    image_done(image);
+
+    /*Inicijalizujemo matricu rotacije*/
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+
     glEnable(GL_DEPTH_TEST);
     glLineWidth(1.5);
 
@@ -457,16 +515,30 @@ static void on_display(void)
 		game = 0;
 		glRotatef(animation_parametar%180, 0, 1, 0);
 	}
-	/*Pod napravljen od kocke translirane tako da
-	njena gornja ivica bude u centru koordinatnog 
-	sistema*/
-	{
-		glColor3f(0,0.4,0);
-		glPushMatrix();
-		glTranslatef(0, -1, 0);
-		glScalef(31, 0, 31);
-		glutSolidCube(1);
 
+	/*Pod - poligon na koji je nalepljena tekstura*/
+	{
+		glColor3f(0,0.6,0);
+		glPushMatrix();
+		glBindTexture(GL_TEXTURE_2D, names[0]);
+		glBegin(GL_POLYGON);
+        glNormal3f(0, 0, 1);
+
+        glTexCoord2f(0, 0);
+        glVertex3f(-15.5, -0.7, 15.5);
+
+        glTexCoord2f(1, 0);
+        glVertex3f(15.5, -0.7, 15.5);
+
+        glTexCoord2f(1, 1);
+        glVertex3f(15.5, -0.7, -15.5);
+
+        glTexCoord2f(0, 1);
+        glVertex3f(-15.5, -0.7, -15.5);
+        
+
+    	glEnd();
+    	glBindTexture(GL_TEXTURE_2D, 0);
 		glPopMatrix();
 
 		/*Desni zid napravljen od kocke koja je translirana
